@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import bexysuttx.blog.controller.AbstractController;
 
 @WebServlet({"/news", "/news/*"})
-public class newsController extends AbstractController {
+public class NewsController extends AbstractController {
 	private static final long serialVersionUID = 2617306785433062648L;
 
 	@Override
