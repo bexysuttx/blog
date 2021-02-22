@@ -8,8 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import bexysuttx.blog.controller.AbstractController;
-import bexysuttx.blog.exception.ApplicationException;
-import bexysuttx.blog.exception.ValidateException;
+
 
 @WebServlet({"/news", "/news/*"})
 public class NewsController extends AbstractController {
