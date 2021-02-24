@@ -13,7 +13,7 @@ public class Article extends AbstractEntity<Long> {
 	private String content;
 	private int idCategory;
 	private Timestamp created;
-	private long view;
+	private long views;
 	private int comments;
 
 	public String getTitle() {
@@ -72,12 +72,12 @@ public class Article extends AbstractEntity<Long> {
 		this.created = created;
 	}
 
-	public long getView() {
-		return view;
+	public long getViews() {
+		return views;
 	}
 
-	public void setView(long view) {
-		this.view = view;
+	public void setViews(long views) {
+		this.views = views;
 	}
 
 	public int getComments() {

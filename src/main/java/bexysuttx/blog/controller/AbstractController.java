@@ -17,13 +17,14 @@ public abstract class AbstractController extends HttpServlet {
 	private static final long serialVersionUID = 2401122740963576989L;
 	protected final Logger LOGGER = LoggerFactory.getLogger(getClass());
 	private BusinessService businessService;
-	
+
 	public final BusinessService getBusinessService() {
 		return businessService;
 	}
+
 	@Override
 	public void init() throws ServletException {
-		 ServiceManager.getInstance(getServletContext()).getBusinessService();
+		businessService = ServiceManager.getInstance(getServletContext()).getBusinessService();
 	}
 
 	public final void forwardToPage(String jspPage, HttpServletRequest req, HttpServletResponse resp)
