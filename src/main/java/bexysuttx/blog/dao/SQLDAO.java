@@ -46,4 +46,19 @@ public final class SQLDAO {
 	public Category findCategoryByUrl(Connection c, String categoryUrl) throws SQLException {
 		return sql.query(c, "select * from category c where c.url=?", new BeanHandler<>(Category.class), categoryUrl);
 	}
+
+	public List<Article> listArticlesBySearchQuery(Connection c, String query, int offset, int limit)
+			throws SQLException {
+		String q = "%" + query + "%";
+		return sql.query(c,
+				"select a.* from article a, category c where (a.title ilike ? or a.content ilike ?) and c.id=a.id_category order by a.id desc limit ? offset ?",
+				new ListMapper<>(new ArticleMapper()), q, q, limit, offset);
+	}
+
+	public int countArticleBySearchQuery(Connection c, String query) throws SQLException {
+		String q = "%" + query + "%";
+		return sql.query(c,
+				"select count(a.*) from article a, category c where (a.title ilike ? or a.content ilike ?) and c.id=a.id_category",
+				new ScalarHandler<Number>(), q, q).intValue();
+	}
 }

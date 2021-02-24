@@ -64,6 +64,18 @@ class BusinessServiceImpl implements BusinessService {
 		} catch (SQLException e) {
 			throw new ApplicationException("Can't execute db command: " + e.getMessage(), e);
 		}
-		
+
+	}
+
+	@Override
+	public Items<Article> listArticlesBySearchQuery(String query, int offset, int limit) {
+		try (Connection c = dataSource.getConnection()) {
+			Items<Article> items = new Items<Article>();
+			items.setItems(sql.listArticlesBySearchQuery(c, query, offset, limit));
+			items.setCount(sql.countArticleBySearchQuery(c, query));
+			return items;
+		} catch (SQLException e) {
+			throw new ApplicationException("Can't execute db command: " + e.getMessage(), e);
+		}
 	}
 }
