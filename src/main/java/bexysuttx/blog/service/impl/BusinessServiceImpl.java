@@ -17,7 +17,7 @@ import bexysuttx.blog.service.BusinessService;
 class BusinessServiceImpl implements BusinessService {
 	private final DataSource dataSource;
 	private final SQLDAO sql;
-	
+
 	BusinessServiceImpl(ServiceManager serviceManager) {
 		super();
 		this.dataSource = serviceManager.basicDataSource;
@@ -32,7 +32,7 @@ class BusinessServiceImpl implements BusinessService {
 			throw new ApplicationException("Can't execute db command: " + e.getMessage(), e);
 		}
 	}
-	
+
 	@Override
 	public Items<Article> listArticles(int offset, int limit) {
 		try (Connection c = dataSource.getConnection()) {
@@ -43,5 +43,27 @@ class BusinessServiceImpl implements BusinessService {
 		} catch (SQLException e) {
 			throw new ApplicationException("Can't execute db command: " + e.getMessage(), e);
 		}
+	}
+
+	@Override
+	public Items<Article> listArticlesByCategory(String categoryUrl, int offset, int limit) {
+		try (Connection c = dataSource.getConnection()) {
+			Items<Article> items = new Items<Article>();
+			items.setItems(sql.listArticlesByCategory(c, categoryUrl, offset, limit));
+			items.setCount(sql.countArticlesByCategory(c, categoryUrl));
+			return items;
+		} catch (SQLException e) {
+			throw new ApplicationException("Can't execute db command: " + e.getMessage(), e);
+		}
+	}
+
+	@Override
+	public Category findCategoryByUrl(String categoryUrl) {
+		try (Connection c = dataSource.getConnection()) {
+			return sql.findCategoryByUrl(c, categoryUrl);
+		} catch (SQLException e) {
+			throw new ApplicationException("Can't execute db command: " + e.getMessage(), e);
+		}
+		
 	}
 }
