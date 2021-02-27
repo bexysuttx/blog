@@ -4,6 +4,7 @@ import java.util.Map;
 
 import bexysuttx.blog.entity.Article;
 import bexysuttx.blog.entity.Category;
+import bexysuttx.blog.exception.RedirectToValidUrlException;
 import bexysuttx.blog.model.Items;
 
 public interface BusinessService {
@@ -17,4 +18,6 @@ public interface BusinessService {
 	Category findCategoryByUrl(String categoryUrl);
 	
 	Items<Article> listArticlesBySearchQuery(String query, int offset, int limit);
+	
+	Article viewArticle(Long idArticle, String requestUrl) throws RedirectToValidUrlException;
 }

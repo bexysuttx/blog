@@ -11,6 +11,7 @@ import bexysuttx.blog.dao.SQLDAO;
 import bexysuttx.blog.entity.Article;
 import bexysuttx.blog.entity.Category;
 import bexysuttx.blog.exception.ApplicationException;
+import bexysuttx.blog.exception.RedirectToValidUrlException;
 import bexysuttx.blog.model.Items;
 import bexysuttx.blog.service.BusinessService;
 
@@ -74,6 +75,26 @@ class BusinessServiceImpl implements BusinessService {
 			items.setItems(sql.listArticlesBySearchQuery(c, query, offset, limit));
 			items.setCount(sql.countArticleBySearchQuery(c, query));
 			return items;
+		} catch (SQLException e) {
+			throw new ApplicationException("Can't execute db command: " + e.getMessage(), e);
+		}
+	}
+
+	@Override
+	public Article viewArticle(Long idArticle, String requestUrl) throws RedirectToValidUrlException {
+		try (Connection c = dataSource.getConnection()) {
+			Article article = sql.viewArticle(c, idArticle);
+			if (article == null) {
+				return null;
+			}
+			if (!article.getArticleLink().equals(requestUrl)) {
+				throw new RedirectToValidUrlException(article.getArticleLink());
+			} else {
+				article.setViews(article.getViews() + 1);
+				sql.updateArticle(c, article);
+				c.commit();
+				return article;
+			}
 		} catch (SQLException e) {
 			throw new ApplicationException("Can't execute db command: " + e.getMessage(), e);
 		}
