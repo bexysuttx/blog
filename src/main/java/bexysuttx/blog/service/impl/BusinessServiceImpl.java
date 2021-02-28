@@ -2,7 +2,7 @@ package bexysuttx.blog.service.impl;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-
+import java.util.List;
 import java.util.Map;
 
 import javax.sql.DataSource;
@@ -10,6 +10,7 @@ import javax.sql.DataSource;
 import bexysuttx.blog.dao.SQLDAO;
 import bexysuttx.blog.entity.Article;
 import bexysuttx.blog.entity.Category;
+import bexysuttx.blog.entity.Comment;
 import bexysuttx.blog.exception.ApplicationException;
 import bexysuttx.blog.exception.RedirectToValidUrlException;
 import bexysuttx.blog.model.Items;
@@ -98,5 +99,15 @@ class BusinessServiceImpl implements BusinessService {
 		} catch (SQLException e) {
 			throw new ApplicationException("Can't execute db command: " + e.getMessage(), e);
 		}
+	}
+
+	@Override
+	public List<Comment> listComments(long idArticle, int offset, int limit) {
+		try (Connection c = dataSource.getConnection()) {
+			return sql.listComments(c, idArticle, offset, limit);
+		} catch (SQLException e) {
+			throw new ApplicationException("Can't execute db command:" + e.getMessage(), e);
+		}
+
 	}
 }

@@ -10,10 +10,12 @@ import org.apache.commons.dbutils.handlers.BeanHandler;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
 
 import bexysuttx.blog.dao.mapper.ArticleMapper;
+import bexysuttx.blog.dao.mapper.CommentMapper;
 import bexysuttx.blog.dao.mapper.ListMapper;
 import bexysuttx.blog.dao.mapper.MapCategoryMapper;
 import bexysuttx.blog.entity.Article;
 import bexysuttx.blog.entity.Category;
+import bexysuttx.blog.entity.Comment;
 
 public final class SQLDAO {
 	private final QueryRunner sql = new QueryRunner();
@@ -68,5 +70,11 @@ public final class SQLDAO {
 
 	public void updateArticle(Connection c, Article article) throws SQLException {
 		sql.update(c, "update article set views=? where id=?", article.getViews(), article.getId());
+	}
+
+	public List<Comment> listComments(Connection c, long idArticle, int offset, int limit) throws SQLException {
+		return sql.query(c,
+				"select c.*, a.name, a.email, a.avatar, a.created as accountCreated  from comment c, account a where c.id_article=? and c.id_account=a.id order by c.id desc limit ? offset ?",
+				new ListMapper<>(new CommentMapper(true)), idArticle, limit, offset);
 	}
 }

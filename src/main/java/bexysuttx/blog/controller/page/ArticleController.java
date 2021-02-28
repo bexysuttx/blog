@@ -1,6 +1,7 @@
 package bexysuttx.blog.controller.page;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -9,8 +10,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 
+import bexysuttx.blog.Constants;
 import bexysuttx.blog.controller.AbstractController;
 import bexysuttx.blog.entity.Article;
+import bexysuttx.blog.entity.Comment;
 import bexysuttx.blog.exception.RedirectToValidUrlException;
 
 @WebServlet("/article/*")
@@ -27,6 +30,9 @@ public class ArticleController extends AbstractController {
 				resp.sendRedirect("/404?url=" + requestUrl);
 			} else {
 				req.setAttribute("article", article);
+				List<Comment> comments = getBusinessService().listComments(article.getId(), 0,
+						Constants.LIMIT_COMMENTS_PER_PAGE);
+				req.setAttribute("comments", comments);
 				forwardToPage("article.jsp", req, resp);
 			}
 		} catch (RedirectToValidUrlException e) {
