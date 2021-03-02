@@ -2,6 +2,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
+<script src="https://apis.google.com/js/platform.js" async defer></script>
+
 <div class="article thumbnail">
 <c:set var="category" value="${CATEGORY_LIST[article.idCategory] }"></c:set>
 	<img src="${article.logo }" alt="${article.title }">
@@ -27,9 +29,9 @@
 		</div>
 		<br>
 		<div class="comments">
-			<div id="new-comment-container" class="media-object comment-item new-comment">
+			
 				<jsp:include page="../fragment/new-comment.jsp"></jsp:include>
-			</div>
+			
 		<div id="comments-list-container" data-comments-count ="${article.comments }" data-id-article="${article.id }">
 	<jsp:include page="../fragment/comments.jsp" />
 			</div>
