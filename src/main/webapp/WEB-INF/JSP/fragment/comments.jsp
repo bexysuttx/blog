@@ -5,7 +5,7 @@
 	<div class="media-object comment-item" data-id-comment="${comment.id }">
 		<div class="media-object-section">
 			<img
-				src="${comment.account.avatarExists ? comment.account.avatar : comment.account.noAvatar }"
+				src="${comment.account.avatarExists ? comment.account.avatar : comment.account.notAvatar }"
 				alt="${comment.account.name }" class="avatar">
 		</div>
 		<div class="media-object-section">

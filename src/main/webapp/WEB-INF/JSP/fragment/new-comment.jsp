@@ -12,7 +12,9 @@
 		 <a href="javascript:submitComment();" class="float-right button" style="margin: 7px 0 0;">Submit</a>
 	</div>
 </div>
-
+<div id="new-comment-loading" class="row column text-center">
+<img alt="Loading..." src="/static/img/loading.gif" class="loading-indicator" style="margin: 12px auto;"/>
+</div>
 <div class="reveal" id="signin-form" data-reveal>
 <h4>You should login before leaving message</h4>
 <div class="row">
