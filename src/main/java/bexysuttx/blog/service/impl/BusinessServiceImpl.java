@@ -21,6 +21,7 @@ import bexysuttx.blog.exception.ApplicationException;
 import bexysuttx.blog.exception.RedirectToValidUrlException;
 import bexysuttx.blog.exception.ValidateException;
 import bexysuttx.blog.form.CommentForm;
+import bexysuttx.blog.form.ContactForm;
 import bexysuttx.blog.model.Items;
 import bexysuttx.blog.model.SocialAccount;
 import bexysuttx.blog.service.AvatarService;
@@ -171,5 +172,14 @@ class BusinessServiceImpl implements BusinessService {
 			}
 			throw new ApplicationException("Can't create new comment: " + e.getMessage(), e);
 		}
+	}
+
+	@Override
+	public void createContactRequest(ContactForm form) throws ValidateException {
+		form.validate(i18nService);
+		String title = i18nService.getMessage("notification.contact.title", form.getLocale());
+		String content = i18nService.getMessage("notification.contact.content", form.getLocale(), form.getName(),
+				form.getEmail(), form.getText());
+		notificationService.sendNotification(title, content);
 	}
 }
