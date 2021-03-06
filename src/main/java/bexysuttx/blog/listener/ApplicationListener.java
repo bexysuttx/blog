@@ -30,6 +30,7 @@ public class ApplicationListener implements ServletContextListener {
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
 		ServiceManager.getInstance(sce.getServletContext()).destroy();
+		
 		LOGGER.info("Application destroyed");
 	}
 

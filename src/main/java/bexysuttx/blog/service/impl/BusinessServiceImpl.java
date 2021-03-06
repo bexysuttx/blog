@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.sql.DataSource;
@@ -25,6 +26,7 @@ import bexysuttx.blog.model.SocialAccount;
 import bexysuttx.blog.service.AvatarService;
 import bexysuttx.blog.service.BusinessService;
 import bexysuttx.blog.service.I18nService;
+import bexysuttx.blog.service.NotificationService;
 import bexysuttx.blog.service.SocialService;
 
 class BusinessServiceImpl implements BusinessService {
@@ -34,14 +36,18 @@ class BusinessServiceImpl implements BusinessService {
 	private final SocialService socialService;
 	private final AvatarService avatarService;
 	private final I18nService i18nService;
+	private final NotificationService notificationService;
+	private final String appHost;
 
 	BusinessServiceImpl(ServiceManager serviceManager) {
 		super();
 		this.dataSource = serviceManager.basicDataSource;
-		this.sql = new SQLDAO();
 		this.socialService = serviceManager.socialService;
 		this.avatarService = serviceManager.avararService;
 		this.i18nService = serviceManager.i18nService;
+		this.notificationService = serviceManager.notificationService;
+		this.appHost = serviceManager.getApplicationProperties("app.host");
+		this.sql = new SQLDAO();
 	}
 
 	@Override
@@ -129,6 +135,15 @@ class BusinessServiceImpl implements BusinessService {
 
 	}
 
+	private void sendNewCommentNotification(Article article, String commentContent, Locale locale) {
+		String fullLink = appHost + article.getArticleLink();
+		String title = i18nService.getMessage("notification.newComment.title", locale, article.getTitle());
+		String content = i18nService.getMessage("notification.newComment.content", locale, article.getTitle(), fullLink,
+				commentContent);
+		notificationService.sendNotification(title, content);
+
+	}
+
 	@Override
 	public Comment createComment(CommentForm form) throws ValidateException {
 		form.validate(i18nService);
@@ -146,8 +161,9 @@ class BusinessServiceImpl implements BusinessService {
 			article.setComments(sql.countComments(c, article.getId()));
 			sql.updateArticleComments(c, article);
 			c.commit();
-			// TODO
+			// notification
 
+			sendNewCommentNotification(article, form.getContent(), form.getLocale());
 			return comment;
 		} catch (RuntimeException | SQLException | IOException e) {
 			if (avatarService.deleteAvatarIfExists(newAvatarPath)) {
