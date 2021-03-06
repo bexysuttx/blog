@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import bexysuttx.blog.service.AvatarService;
 import bexysuttx.blog.service.BusinessService;
+import bexysuttx.blog.service.I18nService;
 import bexysuttx.blog.service.SocialService;
 import bexysuttx.blog.util.AppUtil;
 
@@ -20,6 +21,7 @@ public class ServiceManager {
 	final Properties applicationProperties = new Properties();
 	final SocialService socialService;
 	final AvatarService avararService;
+	final I18nService i18nService;
 	final BasicDataSource basicDataSource;
 	final BusinessService businessService;
 	final ServletContext applicationContext;
@@ -30,6 +32,7 @@ public class ServiceManager {
 		basicDataSource = createBasicDataSource();
 		this.socialService = new GooglePlusSocialService(this);
 		this.avararService = new FileStorageAvatarService(this);
+		this.i18nService = new I18nServiceImpl();
 		businessService = new BusinessServiceImpl(this);
 		LOGGER.info("ServiceManager instance created");
 	}

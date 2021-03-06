@@ -18,11 +18,13 @@ import bexysuttx.blog.entity.Category;
 import bexysuttx.blog.entity.Comment;
 import bexysuttx.blog.exception.ApplicationException;
 import bexysuttx.blog.exception.RedirectToValidUrlException;
+import bexysuttx.blog.exception.ValidateException;
 import bexysuttx.blog.form.CommentForm;
 import bexysuttx.blog.model.Items;
 import bexysuttx.blog.model.SocialAccount;
 import bexysuttx.blog.service.AvatarService;
 import bexysuttx.blog.service.BusinessService;
+import bexysuttx.blog.service.I18nService;
 import bexysuttx.blog.service.SocialService;
 
 class BusinessServiceImpl implements BusinessService {
@@ -31,6 +33,7 @@ class BusinessServiceImpl implements BusinessService {
 	private final SQLDAO sql;
 	private final SocialService socialService;
 	private final AvatarService avatarService;
+	private final I18nService i18nService;
 
 	BusinessServiceImpl(ServiceManager serviceManager) {
 		super();
@@ -38,6 +41,7 @@ class BusinessServiceImpl implements BusinessService {
 		this.sql = new SQLDAO();
 		this.socialService = serviceManager.socialService;
 		this.avatarService = serviceManager.avararService;
+		this.i18nService = serviceManager.i18nService;
 	}
 
 	@Override
@@ -126,7 +130,8 @@ class BusinessServiceImpl implements BusinessService {
 	}
 
 	@Override
-	public Comment createComment(CommentForm form) {
+	public Comment createComment(CommentForm form) throws ValidateException {
+		form.validate(i18nService);
 		String newAvatarPath = null;
 		try (Connection c = dataSource.getConnection()) {
 			SocialAccount socialAccount = socialService.getSocialAccount(form.getAuthToken());

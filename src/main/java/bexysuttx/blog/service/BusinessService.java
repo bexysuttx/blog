@@ -7,6 +7,7 @@ import bexysuttx.blog.entity.Article;
 import bexysuttx.blog.entity.Category;
 import bexysuttx.blog.entity.Comment;
 import bexysuttx.blog.exception.RedirectToValidUrlException;
+import bexysuttx.blog.exception.ValidateException;
 import bexysuttx.blog.form.CommentForm;
 import bexysuttx.blog.model.Items;
 
@@ -26,6 +27,6 @@ public interface BusinessService {
 	
 	List<Comment> listComments(long idArticle, int offset, int limit) ;
 	
-	Comment createComment(CommentForm form);
+	Comment createComment(CommentForm form) throws ValidateException;
 }
 
