@@ -13,9 +13,11 @@ import bexysuttx.blog.dao.mapper.ArticleMapper;
 import bexysuttx.blog.dao.mapper.CommentMapper;
 import bexysuttx.blog.dao.mapper.ListMapper;
 import bexysuttx.blog.dao.mapper.MapCategoryMapper;
+import bexysuttx.blog.entity.Account;
 import bexysuttx.blog.entity.Article;
 import bexysuttx.blog.entity.Category;
 import bexysuttx.blog.entity.Comment;
+import bexysuttx.blog.form.CommentForm;
 
 public final class SQLDAO {
 	private final QueryRunner sql = new QueryRunner();
@@ -76,5 +78,34 @@ public final class SQLDAO {
 		return sql.query(c,
 				"select c.*, a.name, a.email, a.avatar, a.created as accountCreated  from comment c, account a where c.id_article=? and c.id_account=a.id order by c.id desc limit ? offset ?",
 				new ListMapper<>(new CommentMapper(true)), idArticle, limit, offset);
+	}
+
+	public Account findAccountByEmail(Connection c, String email) throws SQLException {
+		return sql.query(c, "select * from account a where a.email=?", new BeanHandler<>(Account.class), email);
+	}
+
+	public Account createNewAccount(Connection c, String email, String name, String avatar) throws SQLException {
+		return sql.insert(c, "insert into account(id,email,name,avatar) values(nextval('account_seq'),?,?,?)",
+				new BeanHandler<>(Account.class), email, name, avatar);
+	}
+
+	public Comment createComment(Connection c, CommentForm form, long idAccount) throws SQLException {
+		return sql.insert(c,
+				"insert into comment(id,id_account, id_article,content) values(nextval('comment_seq'),?,?,?)",
+				new CommentMapper(false), idAccount, form.getIdArticle(), form.getContent());
+	}
+
+	public Article findArticleForNewCommentNotification(Connection c, long id) throws SQLException {
+		return sql.query(c, "select a.id, a.id_category, a.url, a.title from article a where a.id=? ",
+				new ArticleMapper(), id);
+	}
+
+	public int countComments(Connection c, long id) throws SQLException {
+		return sql.query(c, "select count(*) from comment where id_article=?", new ScalarHandler<Number>(), id)
+				.intValue();
+	}
+
+	public void updateArticleComments(Connection c, Article article) throws SQLException {
+		 sql.update(c, "update article set comments=? where id=?", article.getComments(), article.getId());
 	}
 }

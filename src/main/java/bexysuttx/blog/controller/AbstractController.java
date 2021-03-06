@@ -1,12 +1,14 @@
 package bexysuttx.blog.controller;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,4 +51,13 @@ public abstract class AbstractController extends HttpServlet {
 		req.getRequestDispatcher("/WEB-INF/JSP/fragment/" + fragment).forward(req, resp);
 	}
 
+	public final <T> T createForm(HttpServletRequest req, Class<T> formClass) throws ServletException {
+		try {
+			T form = formClass.newInstance();
+			BeanUtils.populate(form, req.getParameterMap());
+			return form;
+		} catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+			throw new ServletException(e);
+		}
+	}
 }

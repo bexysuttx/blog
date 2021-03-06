@@ -12,16 +12,15 @@ import bexysuttx.blog.controller.AbstractController;
 import bexysuttx.blog.entity.Comment;
 import bexysuttx.blog.form.CommentForm;
 
-
 @WebServlet("/ajax/comment")
 public class NewCommentController extends AbstractController {
 	private static final long serialVersionUID = -5926266725626355301L;
 
-@Override
-protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-	 CommentForm form= null;
-	 Comment comment = getBusinessService().createComment(form);
-	 req.setAttribute("comments", Collections.singleton(comment));
-	 forwardToFragment("comments.jsp", req, resp);
-}
+	@Override
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		CommentForm form = createForm(req, CommentForm.class);
+		Comment comment = getBusinessService().createComment(form);
+		req.setAttribute("comments", Collections.singleton(comment));
+		forwardToFragment("comments.jsp", req, resp);
+	}
 }

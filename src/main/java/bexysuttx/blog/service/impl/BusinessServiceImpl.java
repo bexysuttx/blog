@@ -1,12 +1,15 @@
 package bexysuttx.blog.service.impl;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
 import javax.sql.DataSource;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import bexysuttx.blog.dao.SQLDAO;
 import bexysuttx.blog.entity.Account;
@@ -17,16 +20,24 @@ import bexysuttx.blog.exception.ApplicationException;
 import bexysuttx.blog.exception.RedirectToValidUrlException;
 import bexysuttx.blog.form.CommentForm;
 import bexysuttx.blog.model.Items;
+import bexysuttx.blog.model.SocialAccount;
+import bexysuttx.blog.service.AvatarService;
 import bexysuttx.blog.service.BusinessService;
+import bexysuttx.blog.service.SocialService;
 
 class BusinessServiceImpl implements BusinessService {
+	private static final Logger LOGGER = LoggerFactory.getLogger(BusinessServiceImpl.class);
 	private final DataSource dataSource;
 	private final SQLDAO sql;
+	private final SocialService socialService;
+	private final AvatarService avatarService;
 
 	BusinessServiceImpl(ServiceManager serviceManager) {
 		super();
 		this.dataSource = serviceManager.basicDataSource;
 		this.sql = new SQLDAO();
+		this.socialService = serviceManager.socialService;
+		this.avatarService = serviceManager.avararService;
 	}
 
 	@Override
@@ -116,13 +127,28 @@ class BusinessServiceImpl implements BusinessService {
 
 	@Override
 	public Comment createComment(CommentForm form) {
-		Comment comment = new Comment();
-		comment.setContent("test content");
-		comment.setCreated(new Timestamp(System.currentTimeMillis()));
-		Account a = new Account();
-		a.setName("test_account");
-		comment.setAccount(a);
-		comment.setId(0L);
-		return comment;
+		String newAvatarPath = null;
+		try (Connection c = dataSource.getConnection()) {
+			SocialAccount socialAccount = socialService.getSocialAccount(form.getAuthToken());
+			Account account = sql.findAccountByEmail(c, socialAccount.getEmail());
+			if (account == null) {
+				newAvatarPath = avatarService.downloadAvatar(socialAccount.getAvatar());
+				account = sql.createNewAccount(c, socialAccount.getEmail(), socialAccount.getName(), newAvatarPath);
+			}
+			Comment comment = sql.createComment(c, form, account.getId());
+			comment.setAccount(account);
+			Article article = sql.findArticleForNewCommentNotification(c, form.getIdArticle());
+			article.setComments(sql.countComments(c, article.getId()));
+			sql.updateArticleComments(c, article);
+			c.commit();
+			// TODO
+
+			return comment;
+		} catch (RuntimeException | SQLException | IOException e) {
+			if (avatarService.deleteAvatarIfExists(newAvatarPath)) {
+				LOGGER.info("Avatar" + newAvatarPath + "deleted");
+			}
+			throw new ApplicationException("Can't create new comment: " + e.getMessage(), e);
+		}
 	}
 }

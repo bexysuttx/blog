@@ -9,19 +9,27 @@ import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import bexysuttx.blog.service.AvatarService;
 import bexysuttx.blog.service.BusinessService;
+import bexysuttx.blog.service.SocialService;
 import bexysuttx.blog.util.AppUtil;
 
 public class ServiceManager {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ServiceManager.class);
 	private static final String SERVICE_MANAGER = "SERVICE_MANAGER";
 	final Properties applicationProperties = new Properties();
+	final SocialService socialService;
+	final AvatarService avararService;
 	final BasicDataSource basicDataSource;
 	final BusinessService businessService;
+	final ServletContext applicationContext;
 
 	private ServiceManager(ServletContext context) {
+		this.applicationContext = context;
 		AppUtil.loadProperties(applicationProperties, "application.properties");
 		basicDataSource = createBasicDataSource();
+		this.socialService = new GooglePlusSocialService(this);
+		this.avararService = new FileStorageAvatarService(this);
 		businessService = new BusinessServiceImpl(this);
 		LOGGER.info("ServiceManager instance created");
 	}
@@ -39,7 +47,7 @@ public class ServiceManager {
 		try {
 			basicDataSource.close();
 		} catch (SQLException e) {
-			LOGGER.error("Close datasource failed: " + e.getMessage(),e);
+			LOGGER.error("Close datasource failed: " + e.getMessage(), e);
 		}
 		LOGGER.info("ServiceManager instance destroyed");
 	}
