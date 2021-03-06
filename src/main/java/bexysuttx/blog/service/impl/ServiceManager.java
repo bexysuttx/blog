@@ -59,6 +59,10 @@ public class ServiceManager {
 		LOGGER.info("ServiceManager instance destroyed");
 	}
 
+	public I18nService getI18nService() {
+		return i18nService;
+	}
+
 	public BusinessService getBusinessService() {
 		return businessService;
 	}

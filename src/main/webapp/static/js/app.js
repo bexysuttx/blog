@@ -58,6 +58,7 @@ function submitComment() {
 		 		},
 		 		error : function(data) {
 		 			alert(messages.errorAjax);
+		 			$('#new-comment-loading').css('display', 'none');
 		 		}
 		 	});
 		 } else {
