@@ -16,15 +16,6 @@ import bexysuttx.blog.entity.Comment;
 public class MoreAjaxController extends AbstractController {
 	private static final long serialVersionUID = 6141618211915312493L;
 
-	public int getOffset(HttpServletRequest req) {
-		String val = req.getParameter("offset");
-		if (val != null) {
-			return Integer.parseInt(val);
-		} else {
-			return 0;
-		}
-	}
-
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		int offset = getOffset(req);
@@ -33,5 +24,14 @@ public class MoreAjaxController extends AbstractController {
 				Constants.LIMIT_COMMENTS_PER_PAGE);
 		req.setAttribute("comments", comments);
 		forwardToFragment("comments.jsp", req, resp);
+	}
+
+	public int getOffset(HttpServletRequest req) {
+		String val = req.getParameter("offset");
+		if (val != null) {
+			return Integer.parseInt(val);
+		} else {
+			return 0;
+		}
 	}
 }

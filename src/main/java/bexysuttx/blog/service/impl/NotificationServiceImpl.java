@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import bexysuttx.blog.model.AbstractModel;
 import bexysuttx.blog.service.NotificationService;
 
-public class NotificationServiceImpl implements NotificationService {
+class NotificationServiceImpl implements NotificationService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(NotificationServiceImpl.class);
 	private final ServiceManager serviceManager;
 	private final ExecutorService executorService;

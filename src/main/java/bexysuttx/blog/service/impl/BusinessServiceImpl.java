@@ -112,8 +112,7 @@ class BusinessServiceImpl implements BusinessService {
 			Article article = sql.viewArticle(c, idArticle);
 			if (article == null) {
 				return null;
-			}
-			if (!article.getArticleLink().equals(requestUrl)) {
+			} else if (!article.getArticleLink().equals(requestUrl)) {
 				throw new RedirectToValidUrlException(article.getArticleLink());
 			} else {
 				article.setViews(article.getViews() + 1);
@@ -162,8 +161,7 @@ class BusinessServiceImpl implements BusinessService {
 			article.setComments(sql.countComments(c, article.getId()));
 			sql.updateArticleComments(c, article);
 			c.commit();
-			// notification
-
+			// notification  
 			sendNewCommentNotification(article, form.getContent(), form.getLocale());
 			return comment;
 		} catch (RuntimeException | SQLException | IOException e) {

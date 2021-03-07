@@ -17,8 +17,40 @@ import bexysuttx.blog.service.SocialService;
 import bexysuttx.blog.util.AppUtil;
 
 public class ServiceManager {
+	public static ServiceManager getInstance(ServletContext context) {
+		ServiceManager instance = (ServiceManager) context.getAttribute(SERVICE_MANAGER);
+		if (instance == null) {
+			instance = new ServiceManager(context);
+			context.setAttribute(SERVICE_MANAGER, instance);
+		}
+		return instance;
+	}
+	
+	public I18nService getI18nService() {
+		return i18nService;
+	}
+
+	public BusinessService getBusinessService() {
+		return businessService;
+	}
+	
+	public String getApplicationProperties(String property) {
+		return applicationProperties.getProperty(property);
+	}
+
+	public void destroy() {
+		try {
+			basicDataSource.close();
+		} catch (SQLException e) {
+			LOGGER.error("Close datasource failed: " + e.getMessage(), e);
+		}
+		notificationService.shutdown();
+		LOGGER.info("ServiceManager instance destroyed");
+	}
+	
 	private static final Logger LOGGER = LoggerFactory.getLogger(ServiceManager.class);
 	private static final String SERVICE_MANAGER = "SERVICE_MANAGER";
+	
 	final Properties applicationProperties = new Properties();
 	final SocialService socialService;
 	final AvatarService avararService;
@@ -40,33 +72,6 @@ public class ServiceManager {
 		LOGGER.info("ServiceManager instance created");
 	}
 
-	public static ServiceManager getInstance(ServletContext context) {
-		ServiceManager instance = (ServiceManager) context.getAttribute(SERVICE_MANAGER);
-		if (instance == null) {
-			instance = new ServiceManager(context);
-			context.setAttribute(SERVICE_MANAGER, instance);
-		}
-		return instance;
-	}
-
-	public void destroy() {
-		try {
-			basicDataSource.close();
-		} catch (SQLException e) {
-			LOGGER.error("Close datasource failed: " + e.getMessage(), e);
-		}
-		notificationService.shutdown();
-		LOGGER.info("ServiceManager instance destroyed");
-	}
-
-	public I18nService getI18nService() {
-		return i18nService;
-	}
-
-	public BusinessService getBusinessService() {
-		return businessService;
-	}
-
 	private BasicDataSource createBasicDataSource() {
 		BasicDataSource ds = new BasicDataSource();
 		ds.setDefaultAutoCommit(false);
@@ -78,10 +83,6 @@ public class ServiceManager {
 		ds.setInitialSize(Integer.parseInt(getApplicationProperties("db.pool.initSize")));
 		ds.setMaxTotal(Integer.parseInt(getApplicationProperties("db.pool.maxSize")));
 		return ds;
-	}
-
-	public String getApplicationProperties(String property) {
-		return applicationProperties.getProperty(property);
 	}
 
 }
